@@ -68,7 +68,7 @@ Use `gh workflow run` to trigger the "Publish Release" workflow:
 gh workflow run release.yml \
   -f release_tag="v[VERSION]" \
   -f release_notes="[generated content]" \
-  -f draft=true \
+  -f draft=false \
   -f prerelease=false
 
 Please start with Step 1 - analyze the commits and show me the preview.
