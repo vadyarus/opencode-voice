@@ -52,7 +52,7 @@ dispatch via `gh workflow run release.yml`.
 ## Code style
 
 - **ESM only** - `import`/`export`, `"type": "module"` in package.json
-- **No dependencies** - only peer dep on `@opencode-ai/plugin`
+- **No runtime dependencies** - only dev tooling dependencies for lint/format
 - **No build step** - no TypeScript, no bundler
 - **Formatting** - enforced by oxfmt
 - **Linting** - enforced by oxlint
