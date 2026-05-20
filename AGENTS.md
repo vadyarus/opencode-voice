@@ -3,41 +3,21 @@
 Guidelines for AI agents working in this repository. Keep this file concise -
 only document constraints and rules an agent would get wrong without being told.
 
-## Project overview
-
-**opencode-voice** is an OpenCode TUI plugin that adds speech-to-text and
-text-to-speech to the terminal. Records audio via sox, transcribes with
-whisper-cpp, normalizes with an OpenAI-compatible LLM, and speaks responses
-via Piper TTS.
-
 ## Architecture
 
-Single TUI plugin exported from `index.js`, with logic split into modules
-under `lib/`.
+Single TUI plugin exported from `index.js` with logic split into `lib/`.
 
-- `index.js` - entry point, registers all commands from STT + TTS
-- `lib/stt.js` - sox recording, whisper-cpp transcription, LLM normalization
-- `lib/tts.js` - Piper/sox audio pipeline, auto/manual speech, event handlers
-- `lib/llm-client.js` - OpenAI-compatible completion client (`createClient(kv, options)`)
-- `lib/session.js` - shared helpers for reading OpenCode session titles
+## Key invariants
 
-### Key invariants
-
-- Single default export: `{ id, tui }`. OpenCode's TUI loader requires this shape.
-- No server-side plugin. The `server` property must never be added.
-- `registerSTT(api, kv, complete, prompts)` and `registerTTS(api, kv, complete, prompts)`
-  return command arrays. TTS also registers event handlers via `api.event.on()` as a side effect.
+- Single default export: `{ id, tui }`. No server-side plugin.
 - LLM calls use the OpenAI chat completions API, not the Anthropic messages API.
-  This keeps the client provider-agnostic.
-- Configuration uses two mechanisms:
-  - **`options`** (from `tui.json` plugin tuple) for static LLM endpoint config
-  - **`api.kv`** for runtime state (whisper model, mic, TTS mode, voice)
-- No dotfile I/O for config. All persistence goes through `api.kv`.
+- Configuration uses `options` (static) and `api.kv` (runtime). No dotfile I/O.
 - No build step. Plain ESM JavaScript, shipped as-is.
 
 ## Scripts
 
 ```bash
+npm run test         # node --test
 npm run check        # lint + fmt
 npm run lint         # oxlint .
 npm run fmt          # oxfmt --check .
@@ -46,13 +26,12 @@ npm run fmt:fix      # oxfmt --write .
 
 Verify changes: `npm run check` with zero errors.
 
-CI runs on every PR and push to main (lint, build). Releases are manual
-dispatch via `gh workflow run release.yml`.
+CI runs on every PR and push to main (lint, test, build). See
+RELEASE_PROCESS.md for release steps.
 
 ## Code style
 
 - **ESM only** - `import`/`export`, `"type": "module"` in package.json
-- **No runtime dependencies** - only dev tooling dependencies for lint/format
 - **No build step** - no TypeScript, no bundler
 - **Formatting** - enforced by oxfmt
 - **Linting** - enforced by oxlint
