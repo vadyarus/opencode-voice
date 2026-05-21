@@ -100,6 +100,7 @@ Any OpenAI-compatible endpoint works (Ollama, vLLM, LM Studio, etc.).
 - `apiKeyEnv` - environment variable containing the API key
 - `maxTokens` - maximum completion tokens for normalization calls
 - `reasoningEffort` - optional reasoning level for models that support it
+- `chatTemplateKwargs` - extra keyword arguments passed to the model's chat template (e.g. `{"enable_thinking": false}` for Qwen models to disable chain-of-thought)
 - `retries` - number of retry attempts for transient LLM failures
 
 ### Custom prompts

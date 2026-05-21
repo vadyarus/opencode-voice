@@ -93,6 +93,118 @@ test("sends chat completions requests with reasoning_effort when configured", as
   }
 });
 
+test("sends chat_template_kwargs when configured via plugin options", async () => {
+  const previousKey = process.env.TEST_LLM_API_KEY;
+  const previousFetch = globalThis.fetch;
+  const requests = [];
+  process.env.TEST_LLM_API_KEY = "secret";
+
+  globalThis.fetch = async (url, options) => {
+    requests.push({ url, options });
+    return createJsonResponse(200, {
+      choices: [{ message: { content: "text" } }],
+    });
+  };
+
+  try {
+    const client = createClient(createKv(), {
+      endpoint: "https://example.test/v1",
+      model: "qwen-test",
+      apiKeyEnv: "TEST_LLM_API_KEY",
+      chatTemplateKwargs: { enable_thinking: false },
+      retries: 0,
+    });
+
+    const result = await client.complete({ prompt: "Test" });
+    assert.equal(result.text, "text");
+    const body = JSON.parse(requests[0].options.body);
+    assert.deepEqual(body.chat_template_kwargs, { enable_thinking: false });
+    assert.equal(body.reasoning_effort, undefined);
+  } finally {
+    globalThis.fetch = previousFetch;
+    if (previousKey === undefined) {
+      delete process.env.TEST_LLM_API_KEY;
+    } else {
+      process.env.TEST_LLM_API_KEY = previousKey;
+    }
+  }
+});
+
+test("sends chat_template_kwargs when configured via kv with a JSON string", async () => {
+  const previousKey = process.env.TEST_LLM_API_KEY;
+  const previousFetch = globalThis.fetch;
+  const requests = [];
+  process.env.TEST_LLM_API_KEY = "secret";
+
+  globalThis.fetch = async (url, options) => {
+    requests.push({ url, options });
+    return createJsonResponse(200, {
+      choices: [{ message: { content: "text" } }],
+    });
+  };
+
+  try {
+    const client = createClient(
+      createKv({
+        "llm.chatTemplateKwargs": '{"enable_thinking": false}',
+      }),
+      {
+        endpoint: "https://example.test/v1",
+        model: "qwen-test",
+        apiKeyEnv: "TEST_LLM_API_KEY",
+        retries: 0,
+      },
+    );
+
+    const result = await client.complete({ prompt: "Test" });
+    assert.equal(result.text, "text");
+    const body = JSON.parse(requests[0].options.body);
+    assert.deepEqual(body.chat_template_kwargs, { enable_thinking: false });
+  } finally {
+    globalThis.fetch = previousFetch;
+    if (previousKey === undefined) {
+      delete process.env.TEST_LLM_API_KEY;
+    } else {
+      process.env.TEST_LLM_API_KEY = previousKey;
+    }
+  }
+});
+
+test("does not send chat_template_kwargs when not configured", async () => {
+  const previousKey = process.env.TEST_LLM_API_KEY;
+  const previousFetch = globalThis.fetch;
+  const requests = [];
+  process.env.TEST_LLM_API_KEY = "secret";
+
+  globalThis.fetch = async (url, options) => {
+    requests.push({ url, options });
+    return createJsonResponse(200, {
+      choices: [{ message: { content: "text" } }],
+    });
+  };
+
+  try {
+    const client = createClient(createKv(), {
+      endpoint: "https://example.test/v1",
+      model: "test-model",
+      apiKeyEnv: "TEST_LLM_API_KEY",
+      retries: 0,
+    });
+
+    const result = await client.complete({ prompt: "Test" });
+    assert.equal(result.text, "text");
+    const body = JSON.parse(requests[0].options.body);
+    assert.equal(body.chat_template_kwargs, undefined);
+  } finally {
+    globalThis.fetch = previousFetch;
+    if (previousKey === undefined) {
+      delete process.env.TEST_LLM_API_KEY;
+    } else {
+      process.env.TEST_LLM_API_KEY = previousKey;
+    }
+  }
+});
+
 test("retries transient failures and eventually returns the response text", async () => {
   const previousKey = process.env.TEST_LLM_API_KEY;
   const previousFetch = globalThis.fetch;
