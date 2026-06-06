@@ -277,8 +277,10 @@ at the local repo path, not the npm package name:
 
 ### Optional macOS Hammerspoon integration
 
-If you use macOS, Hammerspoon, and Ghostty, see
-`examples/hammerspoon/ghostty-fn.lua` for an optional global `Fn` key setup.
+If you use macOS, [Hammerspoon](https://www.hammerspoon.org/), and
+[Ghostty](https://ghostty.org/), see
+[`examples/hammerspoon/ghostty-fn.lua`](examples/hammerspoon/ghostty-fn.lua)
+for an optional global `Fn` key setup.
 
 Behavior:
 
