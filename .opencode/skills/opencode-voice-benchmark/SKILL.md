@@ -12,7 +12,7 @@ Use this skill to produce actual STT normalization benchmark numbers. Keep the b
 1. Read `lib/stt.js` and copy the exact `STT_SYSTEM_PROMPT` from the tool plus user prompt format. Do not rely on a stale prompt from memory or from this skill if the source file differs:
 
 ```js
-prompt = `Clean up this speech-to-text transcription:\n\n${rawText}`
+prompt = `Clean up this speech-to-text transcription:\n\n${rawText}`;
 ```
 
 2. Read `lib/llm-client.js` to confirm the request body fields and supported options.
@@ -238,7 +238,7 @@ for (const row of summary) {
 6. For Qwen thinking models, pass this request field:
 
 ```json
-{"chat_template_kwargs":{"enable_thinking":false}}
+{ "chat_template_kwargs": { "enable_thinking": false } }
 ```
 
 7. Measure and print per prompt:

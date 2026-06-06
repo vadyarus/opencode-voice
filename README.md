@@ -33,6 +33,15 @@ You must configure at least `endpoint` and `model`:
 }
 ```
 
+### Refresh cached plugin after updates
+
+If OpenCode keeps using an older published version of the plugin after an
+update, clear the cached package and restart OpenCode:
+
+```bash
+rm -rf ~/.cache/opencode/packages/@renjfk/
+```
+
 ## Prerequisites
 
 ### Speech-to-text
@@ -179,12 +188,13 @@ If a path is not set, the built-in default prompt is used.
 
 ### Speech-to-text
 
-| Command       | Keybind  | Description                       |
-| ------------- | -------- | --------------------------------- |
-| `/stt-record` | `ctrl+r` | Start/stop recording + transcribe |
-| `/stt-stop`   |          | Cancel recording                  |
-| `/stt-model`  |          | Select whisper model              |
-| `/stt-mic`    |          | Select microphone                 |
+| Command       | Keybind    | Description                            |
+| ------------- | ---------- | -------------------------------------- |
+| `/stt-record` | `ctrl+r`   | Start/stop recording + transcribe      |
+| `/stt-submit` | `leader+r` | Stop recording, transcribe, and submit |
+| `/stt-stop`   |            | Cancel recording                       |
+| `/stt-model`  |            | Select whisper model                   |
+| `/stt-mic`    |            | Select microphone                      |
 
 ### Text-to-speech
 
@@ -208,9 +218,10 @@ then `s`.
 3. LLM normalizes the transcription: fixes punctuation, removes filler words,
    corrects software engineering homophones ("Jason" to "JSON", "bullion" to
    "boolean", etc.)
-4. Cleaned text is appended to the OpenCode prompt. If normalization fails
-   (e.g. LLM endpoint unreachable), the raw transcription is used as a fallback
-   so you never lose your input
+4. Cleaned text is appended to the OpenCode prompt, or submitted immediately
+   when `/stt-submit` is used. If normalization fails (e.g. LLM endpoint
+   unreachable), the raw transcription is used as a fallback so you never lose
+   your input
 
 ### TTS pipeline
 
@@ -263,6 +274,26 @@ at the local repo path, not the npm package name:
   "plugin": ["/Users/your-user/opencode-voice"]
 }
 ```
+
+### Optional macOS Hammerspoon integration
+
+If you use macOS, Hammerspoon, and Ghostty, see
+`examples/hammerspoon/ghostty-fn.lua` for an optional global `Fn` key setup.
+
+Behavior:
+
+- Press `Fn` to send `ctrl+r` and start recording.
+- Hold `Fn` for at least 0.5 seconds and release to send `leader+r`, which
+  stops recording, normalizes, and submits the prompt.
+
+Notes:
+
+- It assumes OpenCode is using the default leader key, `ctrl+x`.
+- It assumes OpenCode is running in Ghostty terminal `1`.
+- It is best used as a push-to-talk flow: hold `Fn` while speaking, then
+  release to submit.
+- Adjust `APP_NAME`, `TARGET_TERMINAL`, and `LONG_PRESS_THRESHOLD_SECONDS` to
+  fit your setup.
 
 ### Release process
 
