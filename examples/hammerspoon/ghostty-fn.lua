@@ -24,6 +24,7 @@ local SUBMIT_RECORDING_ACTION = "\\x18r"
 
 local fnPressed = false
 local fnPressedAt = 0
+local fnPressStartedInTargetApp = false
 
 local function notifyError(message)
   hs.notify.new({
@@ -32,7 +33,15 @@ local function notifyError(message)
   }):send()
 end
 
-local function isTargetAppFrontmost()
+local function isTargetAppActive()
+  local window = hs.window.focusedWindow()
+  if window ~= nil then
+    local app = window:application()
+    if app ~= nil and app:name() == APP_NAME then
+      return true
+    end
+  end
+
   local app = hs.application.frontmostApplication()
   return app ~= nil and app:name() == APP_NAME
 end
@@ -76,15 +85,17 @@ eventtap.new({ eventTypes.flagsChanged }, function(event)
   if flags.fn and not fnPressed then
     fnPressed = true
     fnPressedAt = hs.timer.secondsSinceEpoch()
-    if isTargetAppFrontmost() then
+    fnPressStartedInTargetApp = isTargetAppActive()
+    if fnPressStartedInTargetApp then
       runGhosttyAction(START_RECORDING_ACTION)
     end
   elseif fnPressed and not flags.fn then
     fnPressed = false
     local heldFor = hs.timer.secondsSinceEpoch() - fnPressedAt
-    if heldFor >= LONG_PRESS_THRESHOLD_SECONDS then
+    if heldFor >= LONG_PRESS_THRESHOLD_SECONDS and fnPressStartedInTargetApp then
       runGhosttyAction(SUBMIT_RECORDING_ACTION)
     end
+    fnPressStartedInTargetApp = false
   end
 
   return false
