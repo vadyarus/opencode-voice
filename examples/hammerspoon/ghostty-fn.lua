@@ -82,7 +82,7 @@ eventtap.new({ eventTypes.flagsChanged }, function(event)
   elseif fnPressed and not flags.fn then
     fnPressed = false
     local heldFor = hs.timer.secondsSinceEpoch() - fnPressedAt
-    if heldFor >= LONG_PRESS_THRESHOLD_SECONDS and isTargetAppFrontmost() then
+    if heldFor >= LONG_PRESS_THRESHOLD_SECONDS then
       runGhosttyAction(SUBMIT_RECORDING_ACTION)
     end
   end
