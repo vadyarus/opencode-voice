@@ -14,12 +14,22 @@ code-heavy responses, etc.).
 
 ## Install
 
-Add to your `tui.json` (create at `~/.config/opencode/tui.json` if it doesn't exist).
-You must configure at least `endpoint` and `model`:
+Add to your `tui.json` (create at `~/.config/opencode/tui.json` if it doesn't
+exist). You must configure at least `endpoint` and `model`:
+
+> [!NOTE]
+> **Clobbering default keybinds.** This plugin uses `ctrl+r` for voice
+> recording, but OpenCode assigns it to session rename by default. Session
+> rename is not used frequently and is still accessible via `/rename`, so we
+> clobber the factory default to let the plugin use `ctrl+r` properly. See
+> the `keybinds` section in the config below.
 
 ```json
 {
   "$schema": "https://opencode.ai/tui.json",
+  "keybinds": {
+    "session_rename": "none"
+  },
   "plugin": [
     [
       "@renjfk/opencode-voice",
