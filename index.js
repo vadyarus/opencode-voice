@@ -65,7 +65,7 @@ export default {
     };
 
     const sttCommands = registerSTT(api, kv, complete, prompts, options, logger);
-    const ttsCommands = registerTTS(api, kv, complete, prompts, logger);
+    const ttsCommands = registerTTS(api, kv, complete, prompts, options, logger);
 
     api.command.register(() => [...sttCommands, ...ttsCommands]);
   },

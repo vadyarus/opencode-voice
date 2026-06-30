@@ -178,6 +178,43 @@ plugin on a machine without whisper-cpp installed.
 
 OpenRouter note: when `sttEndpoint` points at `https://openrouter.ai/api/v1`, the plugin automatically uses OpenRouter's JSON/base64 transcription request format instead of multipart upload.
 
+### TTS API synthesis (optional)
+
+Instead of local Piper, you can use an OpenAI-compatible text-to-speech API
+(e.g. a local API server wrapping Piper, or OpenAI's TTS endpoint). This is
+useful for higher-quality voices or running TTS on a remote machine.
+
+```json
+{
+  "plugin": [
+    [
+      "@renjfk/opencode-voice",
+      {
+        "ttsEndpoint": "http://127.0.0.1:5000/v1",
+        "ttsModel": "tts-1",
+        "ttsApiKeyEnv": "MY_TTS_API_KEY",
+        "ttsVoices": [
+          { "value": "amy", "label": "Amy (UK)" },
+          { "value": "bella", "label": "Bella (US)" }
+        ]
+      }
+    ]
+  ]
+}
+```
+
+- `ttsEndpoint` _(optional)_ - OpenAI-compatible base URL with `/audio/speech` support. When set, Piper is bypassed and all TTS goes through the API
+- `ttsApiKeyEnv` _(optional)_ - environment variable containing the API key. Omit for unauthenticated endpoints
+- `ttsModel` _(optional)_ - TTS model name. If omitted, auto-detected from the first voice returned by `GET {ttsEndpoint}/voices`
+
+The API must respond to `POST /audio/speech` with an OpenAI-compatible JSON body
+(`model`, `input`, `voice`, `response_format`) and return raw WAV audio bytes.
+The audio is piped through `play` (sox) for playback.
+
+On startup, the plugin calls `GET {ttsEndpoint}/voices` to auto-detect the model
+and default voice from the first entry's fields (`voice_id`, `model`, etc.). The
+`/tts-voice` dialog also fetches from this endpoint for the full voice list.
+
 ### Custom prompts
 
 The LLM system prompts used for normalization can be fully replaced by pointing
